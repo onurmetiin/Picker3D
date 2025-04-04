@@ -6,12 +6,12 @@ namespace Runtime.Commands.Level
     {
         private Transform _levelHolder;
 
-        public OnLevelLoaderCommand(Transform levelHolder)
+        internal OnLevelLoaderCommand(Transform levelHolder)
         {
             _levelHolder = levelHolder;
         }
 
-        public void Execute(byte levelIndex)
+        internal void Execute(byte levelIndex)
         {
             Object.Instantiate(Resources.Load<GameObject>($"Prefabs/LevelPrefabs/Level_{levelIndex}"), _levelHolder,true);
         }
