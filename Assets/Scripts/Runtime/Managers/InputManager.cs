@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Runtime.Data.UnityObjects;
 using Runtime.Data.ValueObjects;
@@ -40,11 +41,13 @@ namespace Runtime.Managers
 
         private void OnEnable()
         {
-            SubscribeEvents();
+            StartCoroutine(SubscribeEvents());
+            //SubscribeEvents();
         }
 
-        private void SubscribeEvents()
+        private IEnumerator SubscribeEvents()
         {
+            yield return new WaitForFixedUpdate();
             CoreGameSignals.Instance.onReset += OnReset;
             InputSignals.Instance.onEnableInput += OnEnableInput;
             InputSignals.Instance.onDisableInput += OnDisableInput;
@@ -119,18 +122,21 @@ namespace Runtime.Managers
                         }
                         else if (mouseDeltaPos.x < _data.HorizontalInputSpeed)
                         {
-                            _moveVector.x = -_data.HorizontalInputSpeed / 10 * mouseDeltaPos.x;
+                            _moveVector.x = -_data.HorizontalInputSpeed / 10 * -mouseDeltaPos.x;
                         }
                         else
                         {
                             _moveVector.x = Mathf.SmoothDamp(-_moveVector.x, 0, ref _currentVelocity, _data.ClampSpeed);
                         }
                         
-                        _mousePosition = Input.mousePosition;
+                        _moveVector.x = mouseDeltaPos.x;
+                        
+                        _mousePosition = (Vector2)Input.mousePosition;
+                        
                         InputSignals.Instance.onInputDragged?.Invoke(new HorizontalInputParams()
                         {
                             HorizontalValue =  _moveVector.x,
-                            ClampValues = _data.ClampValues
+                            ClampValues = (float2)_data.ClampValues
                         });
                     }
                 }

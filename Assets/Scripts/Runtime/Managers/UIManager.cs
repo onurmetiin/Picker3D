@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using Runtime.Enums;
 using Runtime.Signals;
 using UnityEngine;
@@ -12,12 +14,18 @@ namespace Runtime.Managers
             SubscribeEvents();
         }
 
-        private void SubscribeEvents()
+        public void SubscribeEvents()
         {
             CoreGameSignals.Instance.onLevelInitialize += OnLevelInitialize;
             CoreGameSignals.Instance.onLevelSuccessful += OnLevelSuccessfull;
             CoreGameSignals.Instance.onLevelFailed += OnLevelFailed;
             CoreGameSignals.Instance.onReset += OnReset;
+            CoreGameSignals.Instance.onStageAreaSuccessful += OnStageAreaSuccessfull;
+        }
+
+        private void OnStageAreaSuccessfull(byte stageValue)
+        {
+            UISignals.Instance.onSetStageColor?.Invoke(stageValue);
         }
 
         private void OnLevelFailed()
@@ -39,7 +47,7 @@ namespace Runtime.Managers
         private void OnReset()
         {
             CoreUISignals.Instance.onCloseAllPanel?.Invoke();
-            CoreUISignals.Instance.onOpenPanel?.Invoke(UIPanelTypes.Start, 1);
+            CoreUISignals.Instance.onOpenPanel?.Invoke(UIPanelTypes.Start, 0);
         }
         
         private void UnSubscribeEvents()
@@ -48,6 +56,7 @@ namespace Runtime.Managers
             CoreGameSignals.Instance.onLevelSuccessful -= OnLevelSuccessfull;
             CoreGameSignals.Instance.onLevelFailed -= OnLevelFailed;
             CoreGameSignals.Instance.onReset -= OnReset;
+            CoreGameSignals.Instance.onStageAreaSuccessful -= OnStageAreaSuccessfull;
         }
 
         private void OnDisable()
@@ -60,7 +69,7 @@ namespace Runtime.Managers
             UISignals.Instance.onPlay?.Invoke();
             CoreUISignals.Instance.onClosePanel?.Invoke(1);
             InputSignals.Instance.onEnableInput?.Invoke();
-            //CameraSignals.Instance.onSetCameraTarget?.Invoke();
+            CameraSignals.Instance.onSetCameraTarget?.Invoke();
         }
 
         public void NextLevel()

@@ -53,11 +53,13 @@ namespace Runtime.Controllers.Player
         private void MovePlayer()
         {
             var velocity = rigidbody.velocity;
-            velocity = new float3(_xValue *_data.SidewaysSpeed, velocity.y, _data.ForwardSpeed);
+            velocity = new Vector3(_xValue *_data.SidewaysSpeed, velocity.y, _data.ForwardSpeed);
             rigidbody.velocity = velocity;
+
+            var position1 = rigidbody.position;
             
             Vector3 position;
-            position = new Vector3(Mathf.Clamp(rigidbody.position.x, _clampValues.x, _clampValues.y),
+            position = new Vector3(Mathf.Clamp(position1.x, _clampValues.x, _clampValues.y),
                 (position = rigidbody.position).y, position.z);
             rigidbody.position = position;
         }

@@ -19,7 +19,7 @@ namespace Runtime.Controllers.Player
 
         #region Private Variables
 
-        private PlayerMeshData _data;
+        [SerializeField] private PlayerMeshData _data;
 
         #endregion
         #endregion

@@ -22,9 +22,9 @@ namespace Runtime.Managers
 
         #region Serialized
 
-        private PlayerMovementController movementController;
-        private PlayerMeshController meshController;
-        private PlayerPhysicsController physicsController;
+        [SerializeField] private PlayerMovementController movementController;
+        [SerializeField] private PlayerMeshController meshController;
+        [SerializeField] private PlayerPhysicsController physicsController;
 
         #endregion
 
@@ -70,13 +70,13 @@ namespace Runtime.Managers
             InputSignals.Instance.onInputReleased += () => movementController.IsReadyToMove(false);
             InputSignals.Instance.onInputDragged += OnInputDragged;
             
-            UISignals.Instance.onPlay += () => movementController.IsReadyToMove(true);
+            UISignals.Instance.onPlay += () => movementController.IsReadyToPlay(true);
             
             CoreGameSignals.Instance.onReset += OnReset;
-            CoreGameSignals.Instance.onLevelSuccessful += () => movementController.IsReadyToMove(false);
-            CoreGameSignals.Instance.onLevelFailed += () => movementController.IsReadyToMove(false);
+            CoreGameSignals.Instance.onLevelSuccessful += () => movementController.IsReadyToPlay(false);
+            CoreGameSignals.Instance.onLevelFailed += () => movementController.IsReadyToPlay(false);
             
-            CoreGameSignals.Instance.onStageAreaEntered += () => movementController.IsReadyToMove(false);
+            CoreGameSignals.Instance.onStageAreaEntered += () => movementController.IsReadyToPlay(false);
             CoreGameSignals.Instance.onStageAreaSuccessful += OnStageAreaSuccessful;
             CoreGameSignals.Instance.onFinishAreaEntered += OnFinishAreaEntered;
         }

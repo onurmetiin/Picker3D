@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Cinemachine;
 using Runtime.Signals;
 using Unity.Mathematics;
@@ -37,11 +38,13 @@ namespace Runtime.Managers
 
         private void OnEnable()
         {
-            SubscribeEvents();
+            StartCoroutine(SubscribeEvents());
+            //SubscribeEvents();
         }
 
-        private void SubscribeEvents()
+        private IEnumerator SubscribeEvents()
         {
+            yield return new WaitForFixedUpdate();
             CameraSignals.Instance.onSetCameraTarget += OnSetCameraTarget;
             CoreGameSignals.Instance.onReset += OnReset;
         }
@@ -53,8 +56,8 @@ namespace Runtime.Managers
 
         private void OnSetCameraTarget()
         {
-            //var player = FindObjectOfType<PlayerManager>().transform;
-            //virtualCamera.Follow = player;
+            var player = FindObjectOfType<PlayerManager>().transform;
+            virtualCamera.Follow = player;
             //virtualCamera.LookAt = player;
         }
         
