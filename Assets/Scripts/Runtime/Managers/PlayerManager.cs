@@ -89,6 +89,8 @@ namespace Runtime.Managers
         private void OnStageAreaSuccessful(byte value)
         {
             StageValue = ++value;
+            movementController.IsReadyToPlay(true);
+            movementController.IsReadyToMove(true);
         }
         
         private void OnFinishAreaEntered()

@@ -92,7 +92,7 @@ namespace Runtime.Controllers.Pool
 
         private void OnTriggerEnter(Collider other)
         {
-            if(other.CompareTag(_collectable)) return;
+            if(!other.CompareTag(_collectable)) return;
             IncreaseCollectedAmount();
             SetCollectedAmountToPool();
         }

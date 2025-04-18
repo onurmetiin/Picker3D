@@ -40,9 +40,10 @@ namespace Runtime.Controllers.Player
                 //Stage Area Pool/Ball Kontrol 
                 DOVirtual.DelayedCall(3, () =>
                 {
-                    var result = other.transform.parent.GetComponentInChildren<PoolController>()
+                    var result = other.transform.parent.GetComponent<PoolController>()
                         .TakeResult(manager.StageValue);
-
+                    
+                    
                     if (result)
                     {
                         CoreGameSignals.Instance.onStageAreaSuccessful?.Invoke(manager.StageValue);
