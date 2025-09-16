@@ -9,10 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a6aca7ec9bd64d6e96bdc776c1743f93, type: 3}
+  m_Script: {fileID: 11500000, guid: 746ff3641c7b4d10908a91cd4a3a44fc, type: 3}
   m_Name: CD_Input
   m_EditorClassIdentifier: 
   Data:
-    HorizontalInputSpeed: 4
-    ClampValues: {x: -9, y: 9}
+    HorizontalInputSpeed: 1.2
+    ClampValues:
+      x: -5.85
+      y: 5.85
     ClampSpeed: 0.07

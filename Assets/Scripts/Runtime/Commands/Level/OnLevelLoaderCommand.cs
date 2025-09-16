@@ -13,7 +13,7 @@ namespace Runtime.Commands.Level
 
         internal void Execute(byte levelIndex)
         {
-            Object.Instantiate(Resources.Load<GameObject>($"Prefabs/LevelPrefabs/Level_{levelIndex}"), _levelHolder,true);
+            Object.Instantiate(Resources.Load<GameObject>($"Prefabs/LevelPrefabs/level {levelIndex}"), _levelHolder, true);
         }
     }
 }

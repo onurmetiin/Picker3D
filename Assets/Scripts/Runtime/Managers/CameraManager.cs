@@ -1,10 +1,7 @@
-using System;
-using System.Collections;
-using Cinemachine;
+﻿using Cinemachine;
 using Runtime.Signals;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 
 namespace Runtime.Managers
 {
@@ -33,25 +30,18 @@ namespace Runtime.Managers
 
         private void Init()
         {
-            _firstPosition = (float3)transform.position;
+            _firstPosition = transform.position;
         }
 
         private void OnEnable()
         {
-            StartCoroutine(SubscribeEvents());
-            //SubscribeEvents();
+            SubscribeEvents();
         }
 
-        private IEnumerator SubscribeEvents()
+        private void SubscribeEvents()
         {
-            yield return new WaitForFixedUpdate();
             CameraSignals.Instance.onSetCameraTarget += OnSetCameraTarget;
             CoreGameSignals.Instance.onReset += OnReset;
-        }
-
-        private void OnReset()
-        {
-            transform.position = _firstPosition;
         }
 
         private void OnSetCameraTarget()
@@ -60,7 +50,12 @@ namespace Runtime.Managers
             virtualCamera.Follow = player;
             //virtualCamera.LookAt = player;
         }
-        
+
+        private void OnReset()
+        {
+            transform.position = _firstPosition;
+        }
+
         private void UnSubscribeEvents()
         {
             CameraSignals.Instance.onSetCameraTarget -= OnSetCameraTarget;

@@ -1,6 +1,6 @@
-using System;
-using Runtime.Data.ValueObjects;
+﻿using Runtime.Data.ValueObjects;
 using Runtime.Keys;
+using Sirenix.OdinInspector;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -18,9 +18,10 @@ namespace Runtime.Controllers.Player
 
         #region Private Variables
 
-        private PlayerMovementData _data;
-        private bool _isReadyToMove, _isReadyToPlay;
-        private float _xValue;
+        [ShowInInspector] private PlayerMovementData _data;
+        [ShowInInspector] private bool _isReadyToMove, _isReadyToPlay;
+        [ShowInInspector] private float _xValue;
+
         private float2 _clampValues;
 
         #endregion
@@ -50,18 +51,10 @@ namespace Runtime.Controllers.Player
             }
         }
 
-        private void MovePlayer()
+        private void StopPlayer()
         {
-            var velocity = rigidbody.velocity;
-            velocity = new Vector3(_xValue *_data.SidewaysSpeed, velocity.y, _data.ForwardSpeed);
-            rigidbody.velocity = velocity;
-
-            var position1 = rigidbody.position;
-            
-            Vector3 position;
-            position = new Vector3(Mathf.Clamp(position1.x, _clampValues.x, _clampValues.y),
-                (position = rigidbody.position).y, position.z);
-            rigidbody.position = position;
+            rigidbody.velocity = Vector3.zero;
+            rigidbody.angularVelocity = Vector3.zero;
         }
 
         private void StopPlayerHorizontally()
@@ -70,10 +63,16 @@ namespace Runtime.Controllers.Player
             rigidbody.angularVelocity = Vector3.zero;
         }
 
-        private void StopPlayer()
+        private void MovePlayer()
         {
-            rigidbody.velocity = Vector3.zero;
-            rigidbody.angularVelocity = Vector3.zero;
+            var velocity = rigidbody.velocity;
+            velocity = new Vector3(_xValue * _data.SidewaySpeed, velocity.y, _data.ForwardSpeed);
+            rigidbody.velocity = velocity;
+            var position1 = rigidbody.position;
+            Vector3 position;
+            position = new Vector3(Mathf.Clamp(position1.x, _clampValues.x, _clampValues.y),
+                (position = rigidbody.position).y, position.z);
+            rigidbody.position = position;
         }
 
         internal void IsReadyToPlay(bool condition)
@@ -91,7 +90,7 @@ namespace Runtime.Controllers.Player
             _xValue = inputParams.HorizontalValue;
             _clampValues = inputParams.ClampValues;
         }
-        
+
         internal void OnReset()
         {
             StopPlayer();

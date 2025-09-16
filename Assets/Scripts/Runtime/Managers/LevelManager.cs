@@ -1,13 +1,10 @@
-using System;
-using System.Collections;
 using Runtime.Commands.Level;
 using Runtime.Data.UnityObjects;
 using Runtime.Data.ValueObjects;
 using Runtime.Enums;
 using Runtime.Signals;
+using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
-using Object = UnityEngine.Object;
 
 namespace Runtime.Managers
 {
@@ -23,10 +20,10 @@ namespace Runtime.Managers
         #endregion
 
         #region Private Variables
-        
+
         private OnLevelLoaderCommand _levelLoaderCommand;
         private OnLevelDestroyerCommand _levelDestroyerCommand;
-        
+
         private short _currentLevel;
         private LevelData _levelData;
 
@@ -47,11 +44,12 @@ namespace Runtime.Managers
             _levelLoaderCommand = new OnLevelLoaderCommand(levelHolder);
             _levelDestroyerCommand = new OnLevelDestroyerCommand(levelHolder);
         }
-        
+
         private LevelData GetLevelData()
         {
-            return Resources.Load<CD_Level>(path:"Data/CD_Level").Levels[_currentLevel];
+            return Resources.Load<CD_Level>("Data/CD_Level").Levels[_currentLevel];
         }
+
         private byte GetActiveLevel()
         {
             return (byte)_currentLevel;
@@ -65,38 +63,38 @@ namespace Runtime.Managers
         private void SubscribeEvents()
         {
             CoreGameSignals.Instance.onLevelInitialize += _levelLoaderCommand.Execute;
-            CoreGameSignals.Instance.onDestroyLevel += _levelDestroyerCommand.Execute;
-
+            CoreGameSignals.Instance.onClearActiveLevel += _levelDestroyerCommand.Execute;
             CoreGameSignals.Instance.onGetLevelValue += OnGetLevelValue;
             CoreGameSignals.Instance.onNextLevel += OnNextLevel;
             CoreGameSignals.Instance.onRestartLevel += OnRestartLevel;
         }
 
-        private byte OnGetLevelValue()
-        {
-            return (byte)_currentLevel;
-        }
-        
+        [Button]
         private void OnNextLevel()
         {
             _currentLevel++;
-            CoreGameSignals.Instance.onDestroyLevel?.Invoke();
+            CoreGameSignals.Instance.onClearActiveLevel?.Invoke();
             CoreGameSignals.Instance.onReset?.Invoke();
             CoreGameSignals.Instance.onLevelInitialize?.Invoke((byte)(_currentLevel % totalLevelCount));
         }
 
+        [Button]
         private void OnRestartLevel()
         {
-            CoreGameSignals.Instance.onDestroyLevel?.Invoke();
+            CoreGameSignals.Instance.onClearActiveLevel?.Invoke();
             CoreGameSignals.Instance.onReset?.Invoke();
             CoreGameSignals.Instance.onLevelInitialize?.Invoke((byte)(_currentLevel % totalLevelCount));
         }
-        
+
+        private byte OnGetLevelValue()
+        {
+            return (byte)((byte)_currentLevel % totalLevelCount);
+        }
+
         private void UnSubscribeEvents()
         {
             CoreGameSignals.Instance.onLevelInitialize -= _levelLoaderCommand.Execute;
-            CoreGameSignals.Instance.onDestroyLevel -= _levelDestroyerCommand.Execute;
-
+            CoreGameSignals.Instance.onClearActiveLevel -= _levelDestroyerCommand.Execute;
             CoreGameSignals.Instance.onGetLevelValue -= OnGetLevelValue;
             CoreGameSignals.Instance.onNextLevel -= OnNextLevel;
             CoreGameSignals.Instance.onRestartLevel -= OnRestartLevel;
@@ -110,11 +108,7 @@ namespace Runtime.Managers
         private void Start()
         {
             CoreGameSignals.Instance.onLevelInitialize?.Invoke((byte)(_currentLevel % totalLevelCount));
-            
-            //UI Signals
-            CoreUISignals.Instance.onOpenPanel?.Invoke(UIPanelTypes.Start,1);
+            CoreUISignals.Instance.onOpenPanel?.Invoke(UIPanelTypes.Start, 1);
         }
-        
     }
-    
 }

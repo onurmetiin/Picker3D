@@ -1,11 +1,12 @@
-using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 using DG.Tweening;
 using Runtime.Data.UnityObjects;
 using Runtime.Data.ValueObjects;
 using Runtime.Signals;
+using Sirenix.OdinInspector;
 using TMPro;
+using Unity.Mathematics;
+using UnityEngine;
 
 namespace Runtime.Controllers.Pool
 {
@@ -19,13 +20,15 @@ namespace Runtime.Controllers.Pool
         [SerializeField] private TextMeshPro poolText;
         [SerializeField] private byte stageID;
         [SerializeField] private new Renderer renderer;
+        [SerializeField] private float3 poolAfterColor = new float3(0.1607843f, 0.3144797f, 0.6039216f);
 
         #endregion
 
         #region Private Variables
 
-        private PoolData _data;
-        private byte _collectedCount;
+        [ShowInInspector] private PoolData _data;
+        [ShowInInspector] private byte _collectedCount;
+
         private readonly string _collectable = "Collectable";
 
         #endregion
@@ -40,7 +43,7 @@ namespace Runtime.Controllers.Pool
         private PoolData GetPoolData()
         {
             return Resources.Load<CD_Level>("Data/CD_Level")
-                .Levels[(int)CoreGameSignals.Instance.onGetLevelValue?.Invoke()].Pools[stageID];
+                .Levels[(int)CoreGameSignals.Instance.onGetLevelValue?.Invoke()].PoolList[stageID];
         }
 
         private void OnEnable()
@@ -54,20 +57,21 @@ namespace Runtime.Controllers.Pool
             CoreGameSignals.Instance.onStageAreaSuccessful += OnChangePoolColor;
         }
 
-        private void OnChangePoolColor(byte stageValue)
-        {
-            if(stageValue != stageID) return;
-            renderer.material.DOColor(new Color(0.1687f, 0.6039f, 0.1766f), 1)
-                .SetEase(Ease.Linear);
-        }
-
         private void OnActivateTweens(byte stageValue)
         {
-            if(stageValue != stageID) return;
+            if (stageValue != stageID) return;
             foreach (var tween in tweens)
             {
                 tween.DOPlay();
             }
+        }
+
+        private void OnChangePoolColor(byte stageValue)
+        {
+            if (stageValue != stageID) return;
+            renderer.material.DOColor(new Color(poolAfterColor.x, poolAfterColor.y, poolAfterColor.z, 1), .5f)
+                .SetEase(Ease.Flash)
+                .SetRelative(false);
         }
 
         private void Start()
@@ -80,26 +84,21 @@ namespace Runtime.Controllers.Pool
             poolText.text = $"0/{_data.RequiredObjectCount}";
         }
 
-
-        public bool TakeResult(byte managerStageValue)
+        public bool TakeResults(byte managerStageValue)
         {
             if (stageID == managerStageValue)
             {
                 return _collectedCount >= _data.RequiredObjectCount;
             }
+
             return false;
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            if(!other.CompareTag(_collectable)) return;
+            if (!other.CompareTag(_collectable)) return;
             IncreaseCollectedAmount();
             SetCollectedAmountToPool();
-        }
-
-        private void SetCollectedAmountToPool()
-        {
-            poolText.text = $"{_collectedCount}/{_data.RequiredObjectCount}";
         }
 
         private void IncreaseCollectedAmount()
@@ -107,16 +106,32 @@ namespace Runtime.Controllers.Pool
             _collectedCount++;
         }
 
-        private void OnTriggerExit(Collider other)
+        private void SetCollectedAmountToPool()
         {
-            if(other.CompareTag(_collectable)) return;
-            SetCollectedAmountToPool();
-            DecreaseCollectedAmount();
+            poolText.text = $"{_collectedCount}/{_data.RequiredObjectCount}";
         }
 
         private void DecreaseCollectedAmount()
         {
             _collectedCount--;
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            if (!other.CompareTag(_collectable)) return;
+            DecreaseCollectedAmount();
+            SetCollectedAmountToPool();
+        }
+
+        private void UnSubscribeEvents()
+        {
+            CoreGameSignals.Instance.onStageAreaSuccessful -= OnActivateTweens;
+            CoreGameSignals.Instance.onStageAreaSuccessful -= OnChangePoolColor;
+        }
+
+        private void OnDisable()
+        {
+            UnSubscribeEvents();
         }
     }
 }
